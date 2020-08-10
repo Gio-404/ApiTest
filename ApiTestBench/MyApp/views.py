@@ -54,3 +54,10 @@ def register_action(request):
         return HttpResponse('注册成功！')
     except:
         return HttpResponse('注册失败~用户名已存在~')
+
+
+def logout(request):
+    from django.contrib import auth
+    auth.logout(request)
+    return HttpResponseRedirect('/login/')
+
