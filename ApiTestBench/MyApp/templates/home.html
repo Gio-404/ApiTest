@@ -2,24 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <style>
+        body{
+            background: url("/static/home.jpg");
+            background-attachment: fixed;
+            background-size: cover;
+        }
+    </style>
 </head>
 <body>
-<div style="text-align: center">
-    <h1>欢迎{{ username }} 使用接口测试平台</h1>
-    <h3>welcome to ApiTest</h3>
-    <div style="border: 1px solid black;width:200px;text-align:left;margin-left:-webkit-calc(50% - 100px);padding-left:10px">
-        <h2>如何使用：</h2>
-        1.打开左侧菜单 <br>
-        2.找到要用的功能 <br>
-        3.点击进入 <br><br>
+    <div style="text-align: center">
+        <h1>
+            <br>
+            欢迎{{ username }} 使用接口测试平台
+        </h1>
+        <h3>welcome to ApiTest</h3>
+        <textarea id="tucao_input" cols="60" rows="10" placeholder="我要吐槽……" style="opacity:0.60;border-radius: 5px;padding-left: 10px;
+        box-shadow: 4px 4px 9px grey"></textarea>
+        <br>
+        <button onclick="tucao()" style="border-radius: 5px;width:100 px">吐槽</button>
     </div>
-    <h2>更新信息:</h2>
-    <span>项目模块管理上限,并修复已知bug</span>
-    <h2>反馈:</h2>
-    <span>如有问题，请发邮件至：123@qq.com</span><br>
-    <span>或进入 <a href="">平台优化建议</a>中进行反馈 </span>
-    <br><br>
-    <img src="/static/team.jpeg" alt="图片丢了" style="width:400px;">
-</div>
+    <script>
+        function tucao() {
+            $.get("/tucao/",{
+                "tucao_text":document.getElementById('tucao_input').value,
+            },function (ret) {
+                alert('已成功吐槽！')
+            })
+        }
+    </script>
 </body>
 </html>

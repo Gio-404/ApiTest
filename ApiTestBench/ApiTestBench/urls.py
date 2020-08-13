@@ -28,4 +28,5 @@ urlpatterns = [
     path('register_action/', register_action),
     path('accounts/login/', login),
     path('logout/', logout),
+    path('tucao/', tucao),
 ]
