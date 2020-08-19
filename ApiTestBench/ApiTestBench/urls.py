@@ -29,4 +29,5 @@ urlpatterns = [
     path('accounts/login/', login),
     path('logout/', logout),
     path('tucao/', tucao),
+    path('help/', api_help),
 ]

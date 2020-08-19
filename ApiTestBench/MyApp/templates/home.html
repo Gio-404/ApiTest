@@ -16,11 +16,20 @@
             <br>
             欢迎{{ username }} 使用接口测试平台
         </h1>
-        <h3>welcome to ApiTest</h3>
+        <div style="color: black;text-align: left;margin-left: 300px">
+            <h3>传送门:</h3>
+            <strong>
+              {% for i in hrefs %}
+                <a href="{{ i.href }}">{{ i.name }}</a><br>
+              {% endfor %}
+            </strong>
+        </div>
+        <div style="position: absolute;bottom: 5px ; right: 5px">
         <textarea id="tucao_input" cols="60" rows="10" placeholder="我要吐槽……" style="opacity:0.60;border-radius: 5px;padding-left: 10px;
         box-shadow: 4px 4px 9px grey"></textarea>
         <br>
         <button onclick="tucao()" style="border-radius: 5px;width:100 px">吐槽</button>
+        </div>
     </div>
     <script>
         function tucao() {

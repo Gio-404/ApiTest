@@ -10,3 +10,11 @@ class DB_tucao(models.Model):
 
     def __str__(self):
         return self.text + str(self.ctime)
+
+
+class DB_home_href(models.Model):
+    name = models.CharField(max_length=30, null=True)
+    href = models.CharField(max_length=2000, null=True)
+
+    def __str__(self):
+        return self.name

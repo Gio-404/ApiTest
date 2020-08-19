@@ -6,6 +6,13 @@ from django.contrib.auth.decorators import login_required
 from MyApp.models import *
 
 
+def child_json(eid):
+    if eid == 'Home.html':
+        data = DB_home_href.objects.all()
+        res = {"hrefs": data}
+    return res
+
+
 @login_required
 def welcome(request):
     print("进入主页成功")
@@ -13,7 +20,8 @@ def welcome(request):
 
 
 def child(request, eid, oid):
-    return render(request, eid)
+    res = child_json(eid)
+    return render(request, eid, res)
 
 
 @login_required
@@ -67,4 +75,8 @@ def tucao(request):
     tucao_text = request.GET['tucao_text']
     DB_tucao.objects.create(user=request.user.username, text=tucao_text)
     return HttpResponse('')
+
+
+def api_help(request):
+    return render(request, 'welcome.html', {"whichHTML": "help.html", "oid": ""})
 
