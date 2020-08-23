@@ -12,23 +12,44 @@
 </head>
 <body>
     <div style="text-align: center">
-        <h1>
-            <br>
+        <h1 style="color: black;margin-left: 410px">
             欢迎{{ username }} 使用接口测试平台
         </h1>
-        <div style="color: black;text-align: left;margin-left: 300px">
-            <h3>传送门:</h3>
+        <div style="border: 1px solid black;border-radius: 10px 0px 0px 10px;text-align: center;background-color: #3ffe3;opacity: 0.8;color: white;margin-left: 400px;">
+            <h3 style="color: #3e2935">传送门:</h3>
             <strong>
               {% for i in hrefs %}
-                <a href="{{ i.href }}">{{ i.name }}</a><br>
+                <a href="{{ i.href }}" target="_blank" style="color:#353c48;text-decoration: none">{{ i.name }}</a><br>
               {% endfor %}
             </strong>
+            <br>
         </div>
-        <div style="position: absolute;bottom: 5px ; right: 5px">
-        <textarea id="tucao_input" cols="60" rows="10" placeholder="我要吐槽……" style="opacity:0.60;border-radius: 5px;padding-left: 10px;
-        box-shadow: 4px 4px 9px grey"></textarea>
         <br>
-        <button onclick="tucao()" style="border-radius: 5px;width:100 px">吐槽</button>
+        <div style="border: 1px solid black;border-radius: 10px 0px 0px 10px;text-align: center;background-color: #3ffe3;opacity: 0.8;color: white;margin-left: 400px">
+            <h3 style="color: #3e2935">您的项目:</h3>
+            <span style="color: black">
+
+            </span>
+            <br>
+        </div>
+        <br>
+        <div style="border: 1px solid black;border-radius: 10px 0px 0px 10px;text-align: center;background-color: #3ffe3;opacity: 0.8;color: white;margin-left: 400px">
+            <h3 style="color: #3e2935">最新消息:</h3>
+            <span style="color: black">
+                帮助页面上线：<br>
+                后台开启，仅限有管理权限的同学使用；<br>
+                项目列表上线，您现在可以进入所有项目内了 <br>
+            </span>
+            <br>
+        </div>
+        <br>
+        <div style="border: 1px solid black;border-radius: 10px 0px 0px 10px;text-align: center;background-color: #3ffe3;opacity: 0.8;color: white;margin-left: 400px">
+        <br>
+        <textarea id="tucao_input" cols="50" rows="5" placeholder="我要吐槽……" style="border-radius: 5px;padding-left: 10px; box-shadow: 4px 4px 9px grey">
+        </textarea>
+        <br>
+        <button style="border-radius: 0px 0px 50px 50px;width: 100px"onclick="tucao()">吐槽</button>
+        <br><br>
         </div>
     </div>
     <script>

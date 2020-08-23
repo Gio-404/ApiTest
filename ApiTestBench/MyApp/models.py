@@ -18,3 +18,13 @@ class DB_home_href(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class DB_project(models.Model):
+    name = models.CharField(max_length=100, null=True)
+    remark = models.CharField(max_length=1000, null=True)
+    user = models.CharField(max_length=200, null=True)
+    other_user = models.CharField(max_length=200, null=True)
+
+    def __str__(self):
+        return self.name

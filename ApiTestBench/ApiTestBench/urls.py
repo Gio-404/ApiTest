@@ -21,7 +21,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('welcome/', welcome),
     path('home/', home),
-    path('case_list/', case_list),
+    path('project_list/', project_list),
+    path('delete_project/', delete_project),
+    path('add_project/', add_project),
     re_path(r"^child/(?P<eid>.+)/(?P<oid>.*)/$", child),
     path('login/', login),
     path('login_action/', login_action),
@@ -30,4 +32,7 @@ urlpatterns = [
     path('logout/', logout),
     path('tucao/', tucao),
     path('help/', api_help),
+    re_path(r'^apis/(?P<id>.*)/$', open_apis),
+    re_path(r'^cases/(?P<id>.*)/$', open_cases),
+    re_path(r'^project_set/(?P<id>.*)/$', open_project_set),
 ]

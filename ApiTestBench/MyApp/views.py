@@ -6,10 +6,17 @@ from django.contrib.auth.decorators import login_required
 from MyApp.models import *
 
 
-def child_json(eid):
+def child_json(eid, oid=''):
+    res = {}
     if eid == 'Home.html':
         data = DB_home_href.objects.all()
         res = {"hrefs": data}
+    if eid == 'project_list.html':
+        data = DB_project.objects.all()
+        res = {"projects": data}
+    if eid == 'P_apis.html' or eid == 'P_cases.html' or eid == "P_project_set.html":
+        project = DB_project.objects.filter(id=oid)[0]
+        res = {"project": project}
     return res
 
 
@@ -20,7 +27,7 @@ def welcome(request):
 
 
 def child(request, eid, oid):
-    res = child_json(eid)
+    res = child_json(eid, oid)
     return render(request, eid, res)
 
 
@@ -29,9 +36,20 @@ def home(request):
     return render(request, 'welcome.html', {"whichHTML": "Home.html", "oid": ""})
 
 
-def case_list(request):
-    print("进入用例列表成功")
-    return render(request, 'case_list.html')
+def project_list(request):
+    return render(request, 'welcome.html', {"whichHTML": "project_list.html", "oid": ""})
+
+
+def delete_project(request):
+    id = request.GET['id']
+    DB_project.objects.filter(id=id).delete()
+    return HttpResponse('')
+
+
+def add_project(request):
+    project_name = request.GET['project_name']
+    DB_project.objects.create(name=project_name, remark='', user=request.user.username, other_user='')
+    return HttpResponse('')
 
 
 def login(request):
@@ -80,3 +98,17 @@ def tucao(request):
 def api_help(request):
     return render(request, 'welcome.html', {"whichHTML": "help.html", "oid": ""})
 
+
+def open_apis(request, id):
+    project_id = id
+    return render(request, 'welcome.html', {"whichHTML": "P_apis.html", "oid": project_id})
+
+
+def open_cases(request, id):
+    project_id = id
+    return render(request, 'welcome.html', {"whichHTML": "P_cases.html", "oid": project_id})
+
+
+def open_project_set(request, id):
+    project_id = id
+    return render(request, 'welcome.html', {"whichHTML": "P_project_set.html", "oid": project_id})
