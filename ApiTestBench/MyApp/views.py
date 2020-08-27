@@ -128,3 +128,16 @@ def save_project_set(request, id):
     other_user = request.GET['other_user']
     DB_project.objects.filter(id=project_id).update(name=name, remark=remark, other_user=other_user)
     return HttpResponse('')
+
+
+def save_bz(request):
+    api_id = request.GET['api_id']
+    bz_value = request.GET['bz_value']
+    DB_apis.objects.filter(id=api_id).update(desc=bz_value)
+    return HttpResponse('')
+
+
+def get_bz(request):
+    api_id = request.GET['api_id']
+    bz_value = DB_apis.objects.filter(id=api_id)[0].desc
+    return HttpResponse(bz_value)
