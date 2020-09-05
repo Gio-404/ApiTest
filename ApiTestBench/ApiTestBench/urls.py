@@ -38,4 +38,5 @@ urlpatterns = [
     re_path(r'^save_project_set/(?P<id>.*)/$', save_project_set),
     path('save_bz/', save_bz),
     path('get_bz/', get_bz),
+    path('Api_save/', Api_save),
 ]
