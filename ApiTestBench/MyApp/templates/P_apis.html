@@ -101,7 +101,9 @@ position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px
         <button onclick="ts_save()" type="button" class="btn btn-success">保存</button>
         <button onclick="ts_close()" type="button" class="btn btn-default">取消</button>
     </div>
-    <h3>接口：<small style="color: greenyellow" id="ts_api_id"></small>-<small style="color: greenyellow" id="ts_api_name"></small></h3>
+    <h4>接口：<small style="color: greenyellow" id="ts_api_id"></small>-
+    <input type="text" id="ts_api_name" style="padding-left: 5px;width: 50%;color: #329104">
+    </h4>
 
     <ul class="nav navbar-nav" style="width: 99%">
         <li>
@@ -252,8 +254,8 @@ position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px
 <script>
     function clear_ts_api() {
         document.getElementById('ts_api_id').innerText = '';
-        document.getElementById('ts_api_name').innerText = '';
-        document.getElementById('ts_method').innerText = 'none';
+        document.getElementById('ts_api_name').value = '';
+        document.getElementById('ts_method').value = 'get';
         document.getElementById('ts_url').value = '';
         document.getElementById('ts_host').value = '';
         document.getElementById('ts_header').value='';
@@ -277,12 +279,13 @@ position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px
         clear_ts_api();
         document.getElementById('ts').style.display = 'block';
         document.getElementById('ts_api_id').innerText = id;
-        document.getElementById('ts_api_name').innerText = name;
+        document.getElementById('ts_api_name').value = name;
     }
     function ts_close() {
         document.getElementById('ts').style.display= 'none';
     }
     function ts_save() {
+        var api_name = document.getElementById('ts_api_name').value;
         var ts_method = document.getElementById('ts_method').value;
         var ts_url = document.getElementById('ts_url').value;
         var ts_host = document.getElementById('ts_host').value;
@@ -336,6 +339,7 @@ position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px
         var api_id = document.getElementById('ts_api_id').innerText;
         $.get('/Api_save/', {
             'api_id':api_id,
+            'api_name':api_name,
             'ts_method':ts_method,
             'ts_url':ts_url,
             'ts_host':ts_host,
@@ -343,7 +347,7 @@ position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px
             'ts_body_method':ts_body_method,
             'ts_api_body':ts_api_body
         },function (ret) {
-            document.getElementById('ts').style.display = 'none';
+            document.location.reload();
         })
     }
 </script>

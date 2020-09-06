@@ -50,6 +50,7 @@ def project_list(request):
 def delete_project(request):
     id = request.GET['id']
     DB_project.objects.filter(id=id).delete()
+    DB_apis.objects.filter(project_id=id).delete()
     return HttpResponse('')
 
 
@@ -151,6 +152,7 @@ def Api_save(request):
     ts_header = request.GET['ts_header']
     ts_body_method = request.GET['ts_body_method']
     ts_api_body = request.GET['ts_api_body']
+    api_name = request.GET['api_name']
 
     DB_apis.objects.filter(id=api_id).update(
         api_method = ts_method,
@@ -158,7 +160,8 @@ def Api_save(request):
         api_header = ts_header,
         api_host = ts_host,
         body_method = ts_body_method,
-        api_body = ts_api_body
+        api_body = ts_api_body,
+        name = api_name
     )
 
     return HttpResponse('success')
