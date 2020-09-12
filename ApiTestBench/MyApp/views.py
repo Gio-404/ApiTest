@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from MyApp.models import *
+import json
 
 
 def child_json(eid, oid=''):
@@ -165,3 +166,8 @@ def Api_save(request):
     )
 
     return HttpResponse('success')
+
+def get_api_data(request):
+    api_id = request.GET['api_id']
+    api = DB_apis.objects.filter(id=api_id).values()[0]
+    return HttpResponse(json.dumps(api),content_type='application/json')

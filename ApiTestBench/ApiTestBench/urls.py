@@ -39,4 +39,5 @@ urlpatterns = [
     path('save_bz/', save_bz),
     path('get_bz/', get_bz),
     path('Api_save/', Api_save),
+    path('get_api_data/', get_api_data),
 ]

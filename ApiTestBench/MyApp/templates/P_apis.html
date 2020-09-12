@@ -193,12 +193,6 @@ position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px
                 window.jQuery || document.write('<script src="/static/201801271505/js/jquery-1.11.0.min.js"><\/script>')
             </script>
             <script type="text/javascript" src="/static/201801271505/js/bootstable.js"></script>
-            <script type="text/javascript">
-    $('#mytable').SetEditable({
-        $addButton: $('#add'),
-    });
-
-            </script>
         </div>
         <div class="tab-pane fade" id="x-www-form-urlencode">
             <div class="table-responsive" style="width: 98%;color: black">
@@ -222,13 +216,6 @@ position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px
                 window.jQuery || document.write('<script src="/static/201801271505/js/jquery-1.11.0.min.js"><\/script>')
             </script>
             <script type="text/javascript" src="/static/201801271505/js/bootstable.js"></script>
-            <script type="text/javascript">
-    $('#mytable2').SetEditable({
-        $addButton: $('#add2'),
-    });
-
-            </script>
-
         </div>
         <div class="tab-pane fade" id="Text">
             <textarea name="" id="raw_Text" style="color: black;width: 98%;height: 300px"></textarea>
@@ -272,14 +259,69 @@ position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px
             $addButton: $('#add'),
         });
         $('#mytable2').SetEditable({
-            $addButton: $('#add'),
+            $addButton: $('#add2'),
         });
     }
     function ts_show(id,name) {
         clear_ts_api();
         document.getElementById('ts').style.display = 'block';
         document.getElementById('ts_api_id').innerText = id;
-        document.getElementById('ts_api_name').value = name;
+        $.get('/get_api_data/',{
+            'api_id':id,
+        },function (ret) {
+            console.log(ret)
+            document.getElementById('ts_api_name').value = ret.name;
+            document.getElementById('ts_method').value = ret.api_method;
+            document.getElementById('ts_url').value = ret.api_url;
+            document.getElementById('ts_host').value = ret.api_host;
+            document.getElementById('ts_header').value = ret.api_header;
+            var body_method = '#'+ret.body_method;
+            $("li a[href="+body_method+"]").click();
+            //请求体显示
+            if(ret.body_method == 'Text'){
+                document.getElementById('raw_Text').value = ret.api_body;
+            }
+            if(ret.body_method == 'JavaScript'){
+                document.getElementById('raw_JavaScript').value = ret.api_body;
+            }
+            if(ret.body_method == 'Json'){
+                document.getElementById('raw_Json').value = ret.api_body;
+            }
+            if(ret.body_method == 'Html'){
+                document.getElementById('raw_Html').value = ret.api_body;
+            }
+            if(ret.body_method == 'Xml'){
+                document.getElementById('raw_Xml').value = ret.api_body;
+            }
+            if(ret.body_method == 'form-data'){
+                var tbody = document.getElementById('mytbody');
+                body = eval(ret.api_body);
+                for(var i=0;i<body.length;i++){
+                    key = body[i][0];
+                    value = body[i][1];
+                    var childs_tr = tbody.children;
+                    childs_tr[i].children[0].innerText = key;
+                    childs_tr[i].children[1].innerText = value;
+                    if(i<body.length-1){
+                        document.getElementById('add').click()
+                    }
+                }
+            }
+            if(ret.body_method == 'x-www-form-urlencode'){
+                var tbody = document.getElementById('mytbody2');
+                body = eval(ret.api_body);
+                for(var i=0;i<body.length;i++){
+                    key = body[i][0];
+                    value = body[i][1];
+                    var childs_tr = tbody.children;
+                    childs_tr[i].children[0].innerText = key;
+                    childs_tr[i].children[1].innerText = value;
+                    if(i<body.length-1){
+                        document.getElementById('add2').click()
+                    }
+                }
+            }
+        })
     }
     function ts_close() {
         document.getElementById('ts').style.display= 'none';
