@@ -44,7 +44,7 @@
             <button onclick="open_bz('{{ i.id }}')" class="btn btn-default">备注</button>
             <button class="btn btn-default">复制</button>
             <button class="btn btn-default">异常值测试</button>
-            <button onclick="" class="btn btn-danger">删除</button>
+            <button onclick="document.location.href='/project_api_del/{{ i.id }}'" class="btn btn-danger">删除</button>
         </td>
     </tr>
     {% endfor %}
@@ -52,7 +52,7 @@
 </table>
 <div style="position: fixed;bottom: 0px;width: 100%;background-color: #f8f8f8;text-align: center; border: 1px solid #e7e7e7">
     <div class="btn-group">
-        <button type="button" class="btn btn-primary">新增接口</button>
+        <button type="button" class="btn btn-primary" onclick="document.location.href='/project_api_add/{{ project.id }}/'">新增接口</button>
         <button type="button" class="btn btn-default">全局请求头</button>
         <button type="button" class="btn btn-default">全局域名</button>
         <button type="button" class="btn btn-default">接口文档导入</button>
@@ -96,13 +96,13 @@
 
 </script>
 <div id="ts" style="display: none;border-radius:5px;width: 60%;
-position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px 8px grey;color: white;padding-left: 10px">
+position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px 8px grey;color: white;padding-left: 10px">
     <div class="btn-group" style="float: right">
         <button onclick="ts_save()" type="button" class="btn btn-success">保存</button>
         <button onclick="ts_close()" type="button" class="btn btn-default">取消</button>
     </div>
-    <h4>接口：<small style="color: greenyellow" id="ts_api_id"></small>-
-    <input type="text" id="ts_api_name" style="padding-left: 5px;width: 50%;color: #329104">
+    <h4>接口名称：<small style="color: greenyellow" id="ts_api_id"></small>-
+    <input placeholder="请输入接口名称" type="text" id="ts_api_name" style="padding-left: 5px;width: 50%;color: #329104">
     </h4>
 
     <ul class="nav navbar-nav" style="width: 99%">
@@ -121,7 +121,7 @@ position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px
         </li>
 
         <li>
-            <button type="button" style="height: 40px;width: 120px;" class="btn btn-default">
+            <button onclick="ts_send()" type="button" style="height: 40px;width: 120px;" class="btn btn-default">
                 <span style="font-size: large">Send</span></button>
         </li>
 
@@ -324,7 +324,7 @@ position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px
         })
     }
     function ts_close() {
-        document.getElementById('ts').style.display= 'none';
+        document.location.reload();
     }
     function ts_save() {
         var api_name = document.getElementById('ts_api_name').value;
@@ -390,6 +390,73 @@ position: fixed;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px
             'ts_api_body':ts_api_body
         },function (ret) {
             document.location.reload();
+        })
+    }
+    function ts_send() {
+        var api_name = document.getElementById('ts_api_name').value;
+        var ts_method = document.getElementById('ts_method').value;
+        var ts_url = document.getElementById('ts_url').value;
+        var ts_host = document.getElementById('ts_host').value;
+        var ts_header = document.getElementById('ts_header').value;
+        var ts_body_method = $('ul#myTab li[class="active"]')[0].innerText;
+        if(ts_body_method == 'none'){
+            var ts_api_body = '';
+        }
+        if(ts_body_method == 'form-data'){
+            var ts_api_body = [];
+            var tbody_ = $("table#mytable tbody")[0];
+            var trlist = tbody_.children;
+            for(var i=0;i<trlist.length;i++) {
+                var tdarr = trlist[i].children;
+                var key = tdarr[0].innerText;
+                var value = tdarr[1].innerText;
+                ts_api_body.push([key, value]);
+            }
+            ts_api_body = JSON.stringify(ts_api_body);
+
+        }
+        if(ts_body_method == 'x-www-form-urlencode'){
+            var ts_api_body = [];
+            var tbody_ = $("table#mytable2 tbody")[0];
+            var trlist = tbody_.children;
+            for(var i=0;i<trlist.length;i++) {
+                var tdarr = trlist[i].children;
+                var key = tdarr[0].innerText;
+                var value = tdarr[1].innerText;
+                ts_api_body.push([key, value]);
+            }
+            ts_api_body = JSON.stringify(ts_api_body);
+
+        }
+        if(ts_body_method == 'Text'){
+            var ts_api_body = document.getElementById('raw_Text').value;
+
+        }
+        if(ts_body_method == 'JavaScript'){
+            var ts_api_body = document.getElementById('raw_JavaScript').value;
+        }
+        if(ts_body_method == 'Json'){
+            var ts_api_body = document.getElementById('raw_Json').value;
+        }
+        if(ts_body_method == 'Html'){
+            var ts_api_body = document.getElementById('raw_Html').value;
+        }
+        if(ts_body_method == 'Xml'){
+            var ts_api_body = document.getElementById('raw_Xml').value;
+        }
+        var api_id = document.getElementById('ts_api_id').innerText;
+        $.get('/Api_send/', {
+            'api_id':api_id,
+            'api_name':api_name,
+            'ts_method':ts_method,
+            'ts_url':ts_url,
+            'ts_host':ts_host,
+            'ts_header':ts_header,
+            'ts_body_method':ts_body_method,
+            'ts_api_body':ts_api_body
+        },function (ret) {
+            $("li a[href=#response]").click();
+            document.getElementById('ts_response_body').value = ret;
         })
     }
 </script>

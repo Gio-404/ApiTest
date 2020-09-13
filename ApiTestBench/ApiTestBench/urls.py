@@ -36,8 +36,11 @@ urlpatterns = [
     re_path(r'^cases/(?P<id>.*)/$', open_cases),
     re_path(r'^project_set/(?P<id>.*)/$', open_project_set),
     re_path(r'^save_project_set/(?P<id>.*)/$', save_project_set),
+    re_path(r'^project_api_add/(?P<Pid>.*)/$', project_api_add),
+    re_path(r'^project_api_del/(?P<id>.*)/$', project_api_del),
     path('save_bz/', save_bz),
     path('get_bz/', get_bz),
     path('Api_save/', Api_save),
     path('get_api_data/', get_api_data),
+    path('Api_send/', Api_send),
 ]

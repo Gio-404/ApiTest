@@ -47,5 +47,8 @@ class DB_apis(models.Model):
     file_name = models.CharField(max_length=50, null=True)
     public_header = models.CharField(max_length=1000, null=True)
 
+    last_body_method = models.CharField(max_length=20, null=True, blank=True)
+    last_api_body = models.CharField(max_length=1000, null=True, blank=True)
+
     def __str__(self):
         return self.name
