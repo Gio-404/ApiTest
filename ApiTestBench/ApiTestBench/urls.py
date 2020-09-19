@@ -43,4 +43,5 @@ urlpatterns = [
     path('Api_save/', Api_save),
     path('get_api_data/', get_api_data),
     path('Api_send/', Api_send),
+    path('copy_api/', copy_api),
 ]
