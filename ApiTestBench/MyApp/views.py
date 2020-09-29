@@ -20,6 +20,8 @@ def child_json(eid, oid=''):
         project = DB_project.objects.filter(id=oid)[0]
         apis = DB_apis.objects.filter(project_id=oid)
         res = {"project": project, "apis": apis}
+        for i in apis:
+            i.api_body = i.api_body.replace('\n','').replace('\r','')
     if eid == 'P_cases.html':
         project = DB_project.objects.filter(id=oid)[0]
         res = {"project": project}
@@ -172,8 +174,6 @@ def Api_save(request):
         ts_api_body = api.last_api_body
     else:
         ts_api_body = request.GET['ts_api_body']
-    
-
     DB_apis.objects.filter(id=api_id).update(
         api_method = ts_method,
         api_url = ts_url,
@@ -190,6 +190,7 @@ def Api_save(request):
 def get_api_data(request):
     api_id = request.GET['api_id']
     api = DB_apis.objects.filter(id=api_id).values()[0]
+    print(type(api["api_body"]))
     return HttpResponse(json.dumps(api),content_type='application/json')
 
 
@@ -248,6 +249,7 @@ def Api_send(request):
         if ts_body_method == 'Xml':
             header['Content-Type'] = 'text/plain'
         response = requests.request(ts_method.upper(), url, headers=header, data=ts_api_body.encode('utf-8'))
+    response.encoding = "utf-8"
     return HttpResponse(response.text)
 
 

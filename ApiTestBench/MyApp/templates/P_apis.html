@@ -40,11 +40,11 @@
         <td>{{ i.name }}</td>
         <td>{{ i.api_url }}</td>
         <td>
-            <button onclick="ts_show('{{ i.id }}','{{ i.name }}')" class="btn btn-success">调试</button>
-            <button onclick="open_bz('{{ i.id }}')" class="btn btn-default">备注</button>
-            <button onclick="copy_api('{{ i.id }}')" class="btn btn-default">复制</button>
-            <button onclick="error_test('{{ i.id }}','{{ i.api_body }}')" class="btn btn-default">异常值测试</button>
-            <button onclick="document.location.href='/project_api_del/{{ i.id }}'" class="btn btn-danger">删除</button>
+            <button onclick="ts_show('{{ i.id }}','{{ i.name }}')" type="button" class="btn btn-success">调试</button>
+            <button onclick="open_bz('{{ i.id }}')" type="button" class="btn btn-default">备注</button>
+            <button onclick="copy_api('{{ i.id }}')" type="button" class="btn btn-default">复制</button>
+            <button onclick="error_test('{{ i.id }}','{{ i.api_body }}')" type="button" class="btn btn-default">异常值测试</button>
+            <button onclick="document.location.href='/project_api_del/{{ i.id }}'" type="button" class="btn btn-danger">删除</button>
         </td>
     </tr>
     {% endfor %}
@@ -263,6 +263,9 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
         });
     }
     function ts_show(id,name) {
+        document.getElementById('mengceng').style.display='block';
+        document.getElementById('mengceng').style.zIndex='998';
+        document.getElementById('ts').style.zIndex='999'
         clear_ts_api();
         document.getElementById('ts').style.display = 'block';
         document.getElementById('ts_api_id').innerText = id;
@@ -499,23 +502,91 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
 {# 异常值测试 #}
 <div id="error_div" style="display: none;border-radius:5px;width: 60%;
 position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 4px 8px grey;color: white;padding-left: 10px">
-<h4> 接口：<small id="error_api_name"></small> 的异常值测试结果如下：</h4>
-<strong>待替换数据：（用英文逗号隔开）</strong>
-<input id="ready_error_data" type="text" style="color: black;border-radius: 5px;width:99%" value="'a',123,'',' ','./!@!#!$%','发送到发斯蒂芬'"><br><br>
-<span>替换：username -> "123"</span>
-<textarea style="width: 99%;height:50px;border-radius: 5px;color:black">
-</textarea>
-<span>替换：username -> "aaa"</span>
-<textarea style="width: 99%;height:50px;border-radius: 5px;color:black">
-</textarea>
-<span>替换：username -> "发生地方"</span>
-<textarea style="width: 99%;height:50px;border-radius: 5px;color:black">
-</textarea>
+    <div class="btn-group" style="float: right">
+        <button onclick="error_play()" type="button" class="btn btn-success">开始</button>
+        <button onclick="error_close()" type="button" class="btn btn-default">关闭</button>
+    </div>
+    <h4> 接口：<small style="color: #0dff00" id="error_api_name"></small> 的异常值测试结果如下：</h4>
+    <strong>待替换数据：（用英文逗号隔开）</strong>
+    <input id="ready_error_data" type="text" style="color: black;border-radius: 5px;width:99%" value="'a',123,'',' ','./!@!#!$%','中文测试'"><br><br>
+    <span>替换：username -> "123"</span>
+    <textarea style="width: 99%;height:50px;border-radius: 5px;color:black">
+    </textarea>
+    <span>替换：username -> "aaa"</span>
+    <textarea style="width: 99%;height:50px;border-radius: 5px;color:black">
+    </textarea>
+    <span>替换：username -> "发生地方"</span>
+    <textarea style="width: 99%;height:50px;border-radius: 5px;color:black">
+    </textarea>
+</div>
+<input type="text" style="display: none" id="error_api_body">
+<script>
+    function error_play() {
+        api_body = document.getElementById('error_api_body').value;
+        ready_error_data = document.getElementById('ready_error_data').value;
+        var r = ready_error_data.split(',');
+        try {
+            var s = eval(api_body);
+            if(s instanceof Array){
+                console.log('这是数组');
+                for(var i=0;i<s.length;i++){
+                    for(var j=0;j<r.length;j++){
+                        var new_body = [];
+                        $.extend(true,new_body,s);
+                        new_body[i][1] = r[j];
+                        console.log(new_body)
+                    }
+                }
+            }else{
+                console.log('这是none');
+                alert('当前请求体不含任何内容!');
+            }
+        }catch(e) {
+            //若不是就继续判断是不是raw-json的json串格式
+            try {
+                var s = JSON.parse(api_body);
+                console.log('这是字典json')
+                for(var i in s){
+                    for(var j=0;j<r.length;j++){
+                        var new_body = {};
+                        $.extend(true,new_body,s);
+                        new_body[i] = r[j];
+                        console.log(new_body)
+                    }
+                }
+            }catch (e) {
+                alert('当前接口的请求体类型不支持异常值测试！')
+            }
+        }
+    }
+    function error_test(api_id,api_body) {
+        document.getElementById('mengceng').style.display='block';
+        document.getElementById('mengceng').style.zIndex='998';
+        document.getElementById('error_div').style.zIndex='999'
+        error_clean();
+        document.getElementById('error_div').style.display='block';
+        document.getElementById('error_api_name').innerText = api_id;
+        document.getElementById('error_api_body').value = api_body;
+    }
+    function error_close() {
+        document.location.reload();
+    }
+    function error_clean() {
+        document.getElementById('error_div').innerHTML = '<div class="btn-group" style="float: right">\n' +
+        '    <button onclick="error_play()" type="button" class="btn btn-success">开始</button>\n' +
+        '    <button onclick="error_close()" type="button" class="btn btn-default">关闭</button>\n' +
+        '</div>\n' +
+        '\n' +
+        '<h4> 接口：<small style="color: #0dff00" id="error_api_name"></small> 的异常值测试结果如下：</h4>\n' +
+        '\n' +
+        '<strong>待替换数据：（用英文逗号隔开）</strong>\n' +
+        '<input id="ready_error_data" type="text" style="color: black;border-radius: 5px;width:99%" value="\'a\',123,\' \',\'./!@*#$%\',\'中文测试\'"><br><br>'
+    }
+</script>
+<div id="mengceng" style="display:none;opacity:0.5;position: absolute;top: 0px;left: 0;background-color:grey;width: 100%;">
 </div>
 <script>
-    function error_test(api_id,api_body) {
-        document.getElementById('error_div').style.display='block';
-    }
+    document.getElementById('mengceng').style.height=window.screen.availHeight.toString()+'px';
 </script>
 </body>
 </html>
