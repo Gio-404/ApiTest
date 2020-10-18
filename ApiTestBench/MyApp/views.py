@@ -20,8 +20,8 @@ def child_json(eid, oid=''):
         project = DB_project.objects.filter(id=oid)[0]
         apis = DB_apis.objects.filter(project_id=oid)
         res = {"project": project, "apis": apis}
-        for i in apis:
-            i.api_body = i.api_body.replace('\n','').replace('\r','')
+        # for i in apis:
+        #     i.api_body = i.api_body.replace('\n','').replace('\r','')
     if eid == 'P_cases.html':
         project = DB_project.objects.filter(id=oid)[0]
         res = {"project": project}
@@ -190,7 +190,6 @@ def Api_save(request):
 def get_api_data(request):
     api_id = request.GET['api_id']
     api = DB_apis.objects.filter(id=api_id).values()[0]
-    print(type(api["api_body"]))
     return HttpResponse(json.dumps(api),content_type='application/json')
 
 
@@ -211,46 +210,51 @@ def Api_send(request):
         ts_api_body = request.GET['ts_api_body']
         api = DB_apis.objects.filter(id=api_id)
         api.update(last_body_method=ts_body_method,last_api_body=ts_api_body)
-
-    header = json.loads(ts_header)
+    try:
+        header = json.loads(ts_header)
+    except:
+        return HttpResponse('请求头不符合json格式！')
     if ts_host[-1] == '/' and ts_url[0] == '/':
         url = ts_host[:-1] + ts_url
     elif ts_host[-1] != '/' and ts_url[0] !='/':
         url = ts_host + '/' + ts_url
     else:
-        url = ts_host + ts_url 
-    if ts_body_method == 'none':
-        response = requests.request(ts_method.upper(),url, headers=header, data={})
-    elif ts_body_method == 'form-data':
-        files = []
-        payload = {}
-        for i in eval(ts_api_body):
-            payload[i[0]] = i[1]
-        response = requests.request(ts_method.upper(), url, headers=header, data=payload, files=files)
-    elif ts_body_method == 'x-www-form-urlencode':
-        header['Content-Type'] = 'application/x-www-form-urlencode'
-        payload = {}
-        for i in eval(ts_api_body):
-            payload[i[0]] = i[1]
-        response = requests.request(ts_method.upper(), url, headers=header, data=payload)
-    else:
-        if ts_body_method == 'Text':
-            header['Content-Type'] = 'text/plain'
+        url = ts_host + ts_url
+    try: 
+        if ts_body_method == 'none':
+            response = requests.request(ts_method.upper(),url, headers=header, data={})
+        elif ts_body_method == 'form-data':
+            files = []
+            payload = {}
+            for i in eval(ts_api_body):
+                payload[i[0]] = i[1]
+            response = requests.request(ts_method.upper(), url, headers=header, data=payload, files=files)
+        elif ts_body_method == 'x-www-form-urlencode':
+            header['Content-Type'] = 'application/x-www-form-urlencode'
+            payload = {}
+            for i in eval(ts_api_body):
+                payload[i[0]] = i[1]
+            response = requests.request(ts_method.upper(), url, headers=header, data=payload)
+        else:
+            if ts_body_method == 'Text':
+                header['Content-Type'] = 'text/plain'
 
-        if ts_body_method == 'JavaScript':
-            header['Content-Type'] = 'text/plain'
+            if ts_body_method == 'JavaScript':
+                header['Content-Type'] = 'text/plain'
 
-        if ts_body_method == 'Json':
-            header['Content-Type'] == 'text/plain'
+            if ts_body_method == 'Json':
+                header['Content-Type'] == 'text/plain'
 
-        if ts_body_method == 'Html':
-            header['Content-type'] == 'text/plain'
+            if ts_body_method == 'Html':
+                header['Content-type'] == 'text/plain'
 
-        if ts_body_method == 'Xml':
-            header['Content-Type'] = 'text/plain'
-        response = requests.request(ts_method.upper(), url, headers=header, data=ts_api_body.encode('utf-8'))
-    response.encoding = "utf-8"
-    return HttpResponse(response.text)
+            if ts_body_method == 'Xml':
+                header['Content-Type'] = 'text/plain'
+            response = requests.request(ts_method.upper(), url, headers=header, data=ts_api_body.encode('utf-8'))
+        response.encoding = "utf-8"
+        return HttpResponse(response.text)
+    except Exception as e:
+        return HttpResponse(str(e))
 
 
 def copy_api(request):
@@ -277,3 +281,50 @@ def copy_api(request):
     )
 
     return HttpResponse('')
+
+
+def error_request(request):
+    api_id = request.GET['api_id']
+    new_body = request.GET['new_body']
+    span_text = request.GET['span_text']
+    api = DB_apis.objects.filter(id=api_id)[0]
+    method = api.api_method
+    url = api.api_url
+    host = api.api_host
+    header = api.api_header
+    body_method = api.body_method
+    try:
+        header = json.loads(header)
+    except:
+        return HttpResponse('请求头不符合json格式！')
+    try:
+        if host[-1] == '/' and url[0] =='/':
+            url = host[:-1] + url
+        elif host[-1] !='/' and url[0] !='/':
+            url = host+ '/' + url
+        else:
+            url = host + url
+        if body_method == 'form-data':
+            files = []
+            payload = {}
+            for i in eval(new_body):
+                payload[i[0]] = i[1]
+            response = requests.request(method.upper(), url, headers=header, data=payload, files=files)
+        elif body_method == 'x-www-form-urlencoded':
+            header['Content-Type'] = 'application/x-www-form-urlencoded'
+            payload = {}
+            for i in eval(new_body):
+                payload[i[0]] = i[1]
+            response = requests.request(method.upper(), url, headers=header, data=payload)
+        elif body_method == 'Json':
+            header['Content-type'] = 'text/plain'
+            response = requests.request(method.upper(), url, headers=header, data=new_body.encode('utf-8'))
+        else:
+            return HttpResponse('非法的请求体类型')
+        response.encoding = "utf-8"
+        res_json = {"response":response.text,"span_text":span_text}
+        return  HttpResponse(json.dumps(res_json),content_type='application/json')
+    except:
+        res_json = {"response": '对不起，接口未通！',"span_text": span_text}
+        return HttpResponse(json.dumps(res_json), content_type='application/json')
+    

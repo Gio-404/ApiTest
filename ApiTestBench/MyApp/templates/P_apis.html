@@ -43,9 +43,10 @@
             <button onclick="ts_show('{{ i.id }}','{{ i.name }}')" type="button" class="btn btn-success">调试</button>
             <button onclick="open_bz('{{ i.id }}')" type="button" class="btn btn-default">备注</button>
             <button onclick="copy_api('{{ i.id }}')" type="button" class="btn btn-default">复制</button>
-            <button onclick="error_test('{{ i.id }}','{{ i.api_body }}')" type="button" class="btn btn-default">异常值测试</button>
+            <button onclick="error_test('{{ i.id }}')" type="button" class="btn btn-default">异常值测试</button>
             <button onclick="document.location.href='/project_api_del/{{ i.id }}'" type="button" class="btn btn-danger">删除</button>
         </td>
+            <input type="text" id="api_error_{{ i.id }}" value="{{ i.api_body }}" style="display: none">
     </tr>
     {% endfor %}
     </tbody>
@@ -153,7 +154,7 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
     <ul id="myTab" class="nav nav-tabs">
         <li class="active"><a id="click_none" href="#none" data-toggle="tab">none</a></li>
         <li><a href="#form-data" data-toggle="tab">form-data</a></li>
-        <li><a href="#x-www-form-urlencode" data-toggle="tab">x-www-form-urlencode</a></li>
+        <li><a href="#x-www-form-urlencoded" data-toggle="tab">x-www-form-urlencoded</a></li>
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">raw<b class="caret"></b></a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">
@@ -194,7 +195,7 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
             </script>
             <script type="text/javascript" src="/static/201801271505/js/bootstable.js"></script>
         </div>
-        <div class="tab-pane fade" id="x-www-form-urlencode">
+        <div class="tab-pane fade" id="x-www-form-urlencoded">
             <div class="table-responsive" style="width: 98%;color: black">
                 <table class="table table-bordered table-striped" id="mytable2" style="background-color:white">
                     <thead style="color: #337ab7;font-size: x-small">
@@ -310,7 +311,7 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
                     }
                 }
             }
-            if(ret.body_method == 'x-www-form-urlencode'){
+            if(ret.body_method == 'x-www-form-urlencoded'){
                 var tbody = document.getElementById('mytbody2');
                 body = eval(ret.api_body);
                 for(var i=0;i<body.length;i++){
@@ -343,7 +344,7 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
         }
         if(ts_header != ''){
             try{
-                JSON.parse(ts_header)
+                JSON.parse(ts_header);
             }catch (e) {
                 alert('header请求头不合符json规范！');
                 return
@@ -366,7 +367,7 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
             ts_api_body = JSON.stringify(ts_api_body);
 
         }
-        if(ts_body_method == 'x-www-form-urlencode'){
+        if(ts_body_method == 'x-www-form-urlencoded'){
             var ts_api_body = [];
             var tbody_ = $("table#mytable2 tbody")[0];
             var trlist = tbody_.children;
@@ -445,7 +446,7 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
             ts_api_body = JSON.stringify(ts_api_body);
 
         }
-        if(ts_body_method == 'x-www-form-urlencode'){
+        if(ts_body_method == 'x-www-form-urlencoded'){
             var ts_api_body = [];
             var tbody_ = $("table#mytable2 tbody")[0];
             var trlist = tbody_.children;
@@ -509,20 +510,23 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
     <h4> 接口：<small style="color: #0dff00" id="error_api_name"></small> 的异常值测试结果如下：</h4>
     <strong>待替换数据：（用英文逗号隔开）</strong>
     <input id="ready_error_data" type="text" style="color: black;border-radius: 5px;width:99%" value="'a',123,'',' ','./!@!#!$%','中文测试'"><br><br>
-    <span>替换：username -> "123"</span>
-    <textarea style="width: 99%;height:50px;border-radius: 5px;color:black">
-    </textarea>
-    <span>替换：username -> "aaa"</span>
-    <textarea style="width: 99%;height:50px;border-radius: 5px;color:black">
-    </textarea>
-    <span>替换：username -> "发生地方"</span>
-    <textarea style="width: 99%;height:50px;border-radius: 5px;color:black">
-    </textarea>
 </div>
 <input type="text" style="display: none" id="error_api_body">
 <script>
+    function error_show_response(span_text,ret) {
+        var error_div = document.getElementById('error_div');
+        var s = document.createElement('span');
+        s.innerText = span_text
+
+        var t = document.createElement('textarea');
+        t.style = 'width: 99%;height: 50px;border-radius: 5px;color: black;margin-bottom: 10px%';
+        t.value = ret;
+        error_div.appendChild(s);
+        error_div.appendChild(t);
+    }
     function error_play() {
         api_body = document.getElementById('error_api_body').value;
+        api_id = document.getElementById('error_api_name').innerText
         ready_error_data = document.getElementById('ready_error_data').value;
         var r = ready_error_data.split(',');
         try {
@@ -533,15 +537,25 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
                     for(var j=0;j<r.length;j++){
                         var new_body = [];
                         $.extend(true,new_body,s);
-                        new_body[i][1] = r[j];
-                        console.log(new_body)
+                        new_body[i][1] = eval(r[j]);
+                        console.log(new_body);
+                        var span_text = '替换：'+new_body[i][0]+'-->'+r[j];
+                        console.log('1'+span_text)
+                        $.get('/error_request/',{
+                            'api_id':api_id,
+                            'new_body':JSON.stringify(new_body),
+                            'span_text':span_text
+                        },function (ret) {
+                            res = eval(ret);
+                            error_show_response(res.span_text,res.response);
+                        });
                     }
                 }
             }else{
                 console.log('这是none');
                 alert('当前请求体不含任何内容!');
             }
-        }catch(e) {
+        }catch (e) {
             //若不是就继续判断是不是raw-json的json串格式
             try {
                 var s = JSON.parse(api_body);
@@ -550,8 +564,17 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
                     for(var j=0;j<r.length;j++){
                         var new_body = {};
                         $.extend(true,new_body,s);
-                        new_body[i] = r[j];
-                        console.log(new_body)
+                        new_body[i] = eval(r[j]);
+                        console.log(new_body);
+                        var span_text = '替换：' +i+'-->'+r[j];
+                        $.get('/error_request/',{
+                            'api_id':api_id,
+                            'new_body':JSON.stringify(new_body),
+                            'span_text':span_text
+                        },function (ret) {
+                            res = eval(ret)
+                            error_show_response(res.span_text,res.response);
+                        });
                     }
                 }
             }catch (e) {
@@ -559,10 +582,11 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
             }
         }
     }
-    function error_test(api_id,api_body) {
+    function error_test(api_id) {
+        var api_body = document.getElementById('api_error_'+api_id).value;
         document.getElementById('mengceng').style.display='block';
         document.getElementById('mengceng').style.zIndex='998';
-        document.getElementById('error_div').style.zIndex='999'
+        document.getElementById('error_div').style.zIndex='999';
         error_clean();
         document.getElementById('error_div').style.display='block';
         document.getElementById('error_api_name').innerText = api_id;

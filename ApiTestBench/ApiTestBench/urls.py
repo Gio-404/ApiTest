@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from MyApp.views import *
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('welcome/', welcome),
@@ -44,4 +45,5 @@ urlpatterns = [
     path('get_api_data/', get_api_data),
     path('Api_send/', Api_send),
     path('copy_api/', copy_api),
+    path('error_request/', error_request),
 ]
