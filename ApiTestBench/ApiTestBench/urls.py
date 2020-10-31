@@ -46,4 +46,5 @@ urlpatterns = [
     path('Api_send/', Api_send),
     path('copy_api/', copy_api),
     path('error_request/', error_request),
+    path('Api_send_home/',Api_send_home),
 ]

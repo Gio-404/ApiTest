@@ -12,7 +12,8 @@ def child_json(eid, oid=''):
     res = {}
     if eid == 'Home.html':
         data = DB_home_href.objects.all()
-        res = {"hrefs": data}
+        home_log = DB_apis_log.objects.filter(user_id=oid)
+        res = {"hrefs": data, "home_log": home_log}
     if eid == 'project_list.html':
         data = DB_project.objects.all()
         res = {"projects": data}
@@ -44,7 +45,7 @@ def child(request, eid, oid):
 
 @login_required
 def home(request):
-    return render(request, 'welcome.html', {"whichHTML": "Home.html", "oid": ""})
+    return render(request, 'welcome.html', {"whichHTML": "Home.html", "oid": request.user.id})
 
 
 def project_list(request):
@@ -60,20 +61,21 @@ def delete_project(request):
 
 def add_project(request):
     project_name = request.GET['project_name']
-    DB_project.objects.create(name=project_name, remark='', user=request.user.username, other_user='')
+    DB_project.objects.create(
+        name=project_name, remark='', user=request.user.username, other_user='')
     return HttpResponse('')
 
 
-def project_api_add(request,Pid):
+def project_api_add(request, Pid):
     project_id = Pid
     DB_apis.objects.create(project_id=project_id, api_method='get')
-    return HttpResponseRedirect('/apis/%s/'%project_id)
+    return HttpResponseRedirect('/apis/%s/' % project_id)
 
 
-def project_api_del(request,id):
+def project_api_del(request, id):
     project_id = DB_apis.objects.filter(id=id)[0].project_id
     DB_apis.objects.filter(id=id).delete()
-    return HttpResponseRedirect('/apis/%s/'%project_id)
+    return HttpResponseRedirect('/apis/%s/' % project_id)
 
 
 def login(request):
@@ -143,7 +145,8 @@ def save_project_set(request, id):
     name = request.GET['name']
     remark = request.GET['remark']
     other_user = request.GET['other_user']
-    DB_project.objects.filter(id=project_id).update(name=name, remark=remark, other_user=other_user)
+    DB_project.objects.filter(id=project_id).update(
+        name=name, remark=remark, other_user=other_user)
     return HttpResponse('')
 
 
@@ -175,13 +178,13 @@ def Api_save(request):
     else:
         ts_api_body = request.GET['ts_api_body']
     DB_apis.objects.filter(id=api_id).update(
-        api_method = ts_method,
-        api_url = ts_url,
-        api_header = ts_header,
-        api_host = ts_host,
-        body_method = ts_body_method,
-        api_body = ts_api_body,
-        name = api_name
+        api_method=ts_method,
+        api_url=ts_url,
+        api_header=ts_header,
+        api_host=ts_host,
+        body_method=ts_body_method,
+        api_body=ts_api_body,
+        name=api_name
     )
 
     return HttpResponse('success')
@@ -190,11 +193,12 @@ def Api_save(request):
 def get_api_data(request):
     api_id = request.GET['api_id']
     api = DB_apis.objects.filter(id=api_id).values()[0]
-    return HttpResponse(json.dumps(api),content_type='application/json')
+    return HttpResponse(json.dumps(api), content_type='application/json')
 
 
 def Api_send(request):
     api_id = request.GET['api_id']
+    api_name = request.GET['api_name']
     ts_method = request.GET['ts_method']
     ts_url = request.GET['ts_url']
     ts_host = request.GET['ts_host']
@@ -209,32 +213,35 @@ def Api_send(request):
     else:
         ts_api_body = request.GET['ts_api_body']
         api = DB_apis.objects.filter(id=api_id)
-        api.update(last_body_method=ts_body_method,last_api_body=ts_api_body)
+        api.update(last_body_method=ts_body_method, last_api_body=ts_api_body)
     try:
         header = json.loads(ts_header)
     except:
         return HttpResponse('请求头不符合json格式！')
     if ts_host[-1] == '/' and ts_url[0] == '/':
         url = ts_host[:-1] + ts_url
-    elif ts_host[-1] != '/' and ts_url[0] !='/':
+    elif ts_host[-1] != '/' and ts_url[0] != '/':
         url = ts_host + '/' + ts_url
     else:
         url = ts_host + ts_url
-    try: 
+    try:
         if ts_body_method == 'none':
-            response = requests.request(ts_method.upper(),url, headers=header, data={})
+            response = requests.request(
+                ts_method.upper(), url, headers=header, data={})
         elif ts_body_method == 'form-data':
             files = []
             payload = {}
             for i in eval(ts_api_body):
                 payload[i[0]] = i[1]
-            response = requests.request(ts_method.upper(), url, headers=header, data=payload, files=files)
+            response = requests.request(
+                ts_method.upper(), url, headers=header, data=payload, files=files)
         elif ts_body_method == 'x-www-form-urlencode':
             header['Content-Type'] = 'application/x-www-form-urlencode'
             payload = {}
             for i in eval(ts_api_body):
                 payload[i[0]] = i[1]
-            response = requests.request(ts_method.upper(), url, headers=header, data=payload)
+            response = requests.request(
+                ts_method.upper(), url, headers=header, data=payload)
         else:
             if ts_body_method == 'Text':
                 header['Content-Type'] = 'text/plain'
@@ -250,7 +257,8 @@ def Api_send(request):
 
             if ts_body_method == 'Xml':
                 header['Content-Type'] = 'text/plain'
-            response = requests.request(ts_method.upper(), url, headers=header, data=ts_api_body.encode('utf-8'))
+            response = requests.request(
+                ts_method.upper(), url, headers=header, data=ts_api_body.encode('utf-8'))
         response.encoding = "utf-8"
         return HttpResponse(response.text)
     except Exception as e:
@@ -261,23 +269,23 @@ def copy_api(request):
     api_id = request.GET['api_id']
     old_api = DB_apis.objects.filter(id=api_id)[0]
     DB_apis.objects.create(
-        project_id = old_api.project_id,
-        name = old_api.name+'_副本',
-        api_method = old_api.api_method,
-        api_url = old_api.api_url,
-        api_header = old_api.api_header,
-        api_login = old_api.api_login,
-        api_host = old_api.api_host,
-        desc = old_api.desc,
-        body_method = old_api.body_method,
-        api_body = old_api.api_body,
-        result = old_api.result,
-        sign = old_api.sign,
-        file_key = old_api.file_key,
-        file_name = old_api.file_name,
-        public_header = old_api.public_header,
-        last_body_method = old_api.last_body_method,
-        last_api_body = old_api.last_api_body
+        project_id=old_api.project_id,
+        name=old_api.name+'_副本',
+        api_method=old_api.api_method,
+        api_url=old_api.api_url,
+        api_header=old_api.api_header,
+        api_login=old_api.api_login,
+        api_host=old_api.api_host,
+        desc=old_api.desc,
+        body_method=old_api.body_method,
+        api_body=old_api.api_body,
+        result=old_api.result,
+        sign=old_api.sign,
+        file_key=old_api.file_key,
+        file_name=old_api.file_name,
+        public_header=old_api.public_header,
+        last_body_method=old_api.last_body_method,
+        last_api_body=old_api.last_api_body
     )
 
     return HttpResponse('')
@@ -298,10 +306,10 @@ def error_request(request):
     except:
         return HttpResponse('请求头不符合json格式！')
     try:
-        if host[-1] == '/' and url[0] =='/':
+        if host[-1] == '/' and url[0] == '/':
             url = host[:-1] + url
-        elif host[-1] !='/' and url[0] !='/':
-            url = host+ '/' + url
+        elif host[-1] != '/' and url[0] != '/':
+            url = host + '/' + url
         else:
             url = host + url
         if body_method == 'form-data':
@@ -309,22 +317,82 @@ def error_request(request):
             payload = {}
             for i in eval(new_body):
                 payload[i[0]] = i[1]
-            response = requests.request(method.upper(), url, headers=header, data=payload, files=files)
+            response = requests.request(
+                method.upper(), url, headers=header, data=payload, files=files)
         elif body_method == 'x-www-form-urlencoded':
             header['Content-Type'] = 'application/x-www-form-urlencoded'
             payload = {}
             for i in eval(new_body):
                 payload[i[0]] = i[1]
-            response = requests.request(method.upper(), url, headers=header, data=payload)
+            response = requests.request(
+                method.upper(), url, headers=header, data=payload)
         elif body_method == 'Json':
             header['Content-type'] = 'text/plain'
-            response = requests.request(method.upper(), url, headers=header, data=new_body.encode('utf-8'))
+            response = requests.request(
+                method.upper(), url, headers=header, data=new_body.encode('utf-8'))
         else:
             return HttpResponse('非法的请求体类型')
         response.encoding = "utf-8"
-        res_json = {"response":response.text,"span_text":span_text}
-        return  HttpResponse(json.dumps(res_json),content_type='application/json')
-    except:
-        res_json = {"response": '对不起，接口未通！',"span_text": span_text}
+        res_json = {"response": response.text, "span_text": span_text}
         return HttpResponse(json.dumps(res_json), content_type='application/json')
-    
+    except:
+        res_json = {"response": '对不起，接口未通！', "span_text": span_text}
+        return HttpResponse(json.dumps(res_json), content_type='application/json')
+
+
+def Api_send_home(request):
+    ts_method = request.GET['ts_method']
+    ts_url = request.GET['ts_url']
+    ts_host = request.GET['ts_host']
+    ts_header = request.GET['ts_header']
+    ts_body_method = request.GET['ts_body_method']
+    ts_api_body = request.GET['ts_api_body']
+    try:
+        header = json.loads(ts_header)
+    except:
+        return HttpResponse('请求头不符合json格式！')
+    if ts_host[-1] == '/' and ts_url[0] == '/':
+        url = ts_host[:-1] + ts_url
+    elif ts_host[-1] != '/' and ts_url[0] != '/':
+        url = ts_host + '/' + ts_url
+    else:
+        url = ts_host + ts_url
+    try:
+        if ts_body_method == 'none':
+            response = requests.request(
+                ts_method.upper(), url, headers=header, data={})
+        elif ts_body_method == 'form-data':
+            files = []
+            payload = {}
+            for i in eval(ts_api_body):
+                payload[i[0]] = i[1]
+            response = requests.request(
+                ts_method.upper(), url, headers=header, data=payload, files=files)
+        elif ts_body_method == 'x-www-form-urlencode':
+            header['Content-Type'] = 'application/x-www-form-urlencode'
+            payload = {}
+            for i in eval(ts_api_body):
+                payload[i[0]] = i[1]
+            response = requests.request(
+                ts_method.upper(), url, headers=header, data=payload)
+        else:
+            if ts_body_method == 'Text':
+                header['Content-Type'] = 'text/plain'
+
+            if ts_body_method == 'JavaScript':
+                header['Content-Type'] = 'text/plain'
+
+            if ts_body_method == 'Json':
+                header['Content-Type'] == 'text/plain'
+
+            if ts_body_method == 'Html':
+                header['Content-type'] == 'text/plain'
+
+            if ts_body_method == 'Xml':
+                header['Content-Type'] = 'text/plain'
+            response = requests.request(
+                ts_method.upper(), url, headers=header, data=ts_api_body.encode('utf-8'))
+        response.encoding = "utf-8"
+        return HttpResponse(response.text)
+    except Exception as e:
+        return HttpResponse(str(e))
