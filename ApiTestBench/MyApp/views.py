@@ -8,12 +8,16 @@ import json
 import requests
 
 
-def child_json(eid, oid=''):
+def child_json(eid, oid='', ooid=''):
     res = {}
     if eid == 'Home.html':
         data = DB_home_href.objects.all()
-        home_log = DB_apis_log.objects.filter(user_id=oid)
-        res = {"hrefs": data, "home_log": home_log}
+        home_log = DB_apis_log.objects.filter(user_id=oid)[::-1]
+        if ooid == '':
+            res = {"hrefs":data,"home_log":home_log}
+        else:
+            log = DB_apis_log.objects.filter(id=ooid)[0]
+            res = {"hrefs": data, "home_log": home_log,"log":log}
     if eid == 'project_list.html':
         data = DB_project.objects.all()
         res = {"projects": data}
@@ -29,6 +33,10 @@ def child_json(eid, oid=''):
     if eid == 'P_project_set.html':
         project = DB_project.objects.filter(id=oid)[0]
         res = {"project": project}
+    if eid == 'P_cases.html':
+        Cases = DB_cases.objects.filter(project_id=oid)
+        print(Cases)
+        res = {"project":project,"Cases":Cases}
     return res
 
 
@@ -38,14 +46,14 @@ def welcome(request):
     return render(request, 'welcome.html')
 
 
-def child(request, eid, oid):
-    res = child_json(eid, oid)
+def child(request, eid, oid, ooid):
+    res = child_json(eid, oid, ooid)
     return render(request, eid, res)
 
 
 @login_required
-def home(request):
-    return render(request, 'welcome.html', {"whichHTML": "Home.html", "oid": request.user.id})
+def home(request,log_id=''):
+    return render(request, 'welcome.html', {"whichHTML": "Home.html", "oid": request.user.id,"ooid":log_id})
 
 
 def project_list(request):
@@ -351,6 +359,8 @@ def Api_send_home(request):
         header = json.loads(ts_header)
     except:
         return HttpResponse('请求头不符合json格式！')
+    DB_apis_log.objects.create(user_id=request.user.id, api_method=ts_method, api_url=ts_url,
+                               api_header=ts_header, api_host=ts_host, body_method=ts_body_method, api_body=ts_api_body)
     if ts_host[-1] == '/' and ts_url[0] == '/':
         url = ts_host[:-1] + ts_url
     elif ts_host[-1] != '/' and ts_url[0] != '/':
@@ -396,3 +406,19 @@ def Api_send_home(request):
         return HttpResponse(response.text)
     except Exception as e:
         return HttpResponse(str(e))
+
+
+def get_home_log(request):
+    user_id = request.user.id
+    all_logs = DB_apis_log.objects.filter(user_id=user_id)
+    ret = {"all_logs": list(all_logs.values(
+        "id", "api_method", "api_host", "api_url"))[::-1]}
+    return HttpResponse(json.dumps(ret), content_type='application/json')
+
+
+def get_api_log_home(request):
+    log_id = request.GET['log_id']
+    log = DB_apis_log.objects.filter(id=log_id)
+    ret = {"log": list(log.values())[0]}
+    print(ret)
+    return HttpResponse(json.dumps(ret), content_type='application/json')

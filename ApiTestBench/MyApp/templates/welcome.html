@@ -74,14 +74,14 @@
                     searchable: true,
                     theme: 'dark-lesb'
                 });
-                console.log(rvnMenu);
+//                console.log(rvnMenu);
 //                rvnMenu.setMode('minimal');
                 rvnMenu.setTheme('dark-ruby');
             });
         </script>
 <div id="page1"></div>
 <script>
-    $('#page1').load('/child/'+'{{ whichHTML }}/{{ oid }}/')
+    $('#page1').load('/child/'+'{{ whichHTML }}/{{ oid }}/{{ ooid }}/')
 </script>
 <script>
     if( "{{ whichHTML }}" != 'Home.html'){

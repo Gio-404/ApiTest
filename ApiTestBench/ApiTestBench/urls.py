@@ -25,7 +25,7 @@ urlpatterns = [
     path('project_list/', project_list),
     path('delete_project/', delete_project),
     path('add_project/', add_project),
-    re_path(r"^child/(?P<eid>.+)/(?P<oid>.*)/$", child),
+    re_path(r"^child/(?P<eid>.+)/(?P<oid>.*)/(?P<ooid>.*)/$", child),
     path('login/', login),
     path('login_action/', login_action),
     path('register_action/', register_action),
@@ -47,4 +47,7 @@ urlpatterns = [
     path('copy_api/', copy_api),
     path('error_request/', error_request),
     path('Api_send_home/',Api_send_home),
+    path('get_home_log/',get_home_log),
+    path('get_api_log_home/',get_api_log_home),
+    re_path(r'^home_log/(?P<log_id>.*)/$', home),
 ]

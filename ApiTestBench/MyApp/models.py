@@ -53,8 +53,9 @@ class DB_apis(models.Model):
     def __str__(self):
         return self.name
 
+
 class DB_apis_log(models.Model):
-    user_id = models.CharField(max_length=10,null=True)
+    user_id = models.CharField(max_length=10, null=True)
     api_method = models.CharField(max_length=10, null=True)
     api_url = models.CharField(max_length=1000, null=True)
     api_header = models.CharField(max_length=1000, null=True)
@@ -69,3 +70,9 @@ class DB_apis_log(models.Model):
     def __str__(self):
         return self.api_url
 
+class DB_cases(models.Model):
+    project_id = models.CharField(max_length=10,null=True)
+    name = models.CharField(max_length=50,null=True)
+
+    def __str__(self):
+        return self.name
