@@ -50,4 +50,7 @@ urlpatterns = [
     path('get_home_log/',get_home_log),
     path('get_api_log_home/',get_api_log_home),
     re_path(r'^home_log/(?P<log_id>.*)/$', home),
+    re_path(r'^add_case/(?P<eid>.*)/$', add_case),
+    re_path(r'^del_case/(?P<eid>.*)/(?P<oid>.*)/$', del_case),
+    re_path(r'^copy_case/(?P<eid>.*)/(?P<oid>.*)/$', copy_case),
 ]

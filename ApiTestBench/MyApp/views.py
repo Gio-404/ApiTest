@@ -14,10 +14,10 @@ def child_json(eid, oid='', ooid=''):
         data = DB_home_href.objects.all()
         home_log = DB_apis_log.objects.filter(user_id=oid)[::-1]
         if ooid == '':
-            res = {"hrefs":data,"home_log":home_log}
+            res = {"hrefs": data, "home_log": home_log}
         else:
             log = DB_apis_log.objects.filter(id=ooid)[0]
-            res = {"hrefs": data, "home_log": home_log,"log":log}
+            res = {"hrefs": data, "home_log": home_log, "log": log}
     if eid == 'project_list.html':
         data = DB_project.objects.all()
         res = {"projects": data}
@@ -35,8 +35,7 @@ def child_json(eid, oid='', ooid=''):
         res = {"project": project}
     if eid == 'P_cases.html':
         Cases = DB_cases.objects.filter(project_id=oid)
-        print(Cases)
-        res = {"project":project,"Cases":Cases}
+        res = {"project": project, "Cases": Cases}
     return res
 
 
@@ -52,8 +51,8 @@ def child(request, eid, oid, ooid):
 
 
 @login_required
-def home(request,log_id=''):
-    return render(request, 'welcome.html', {"whichHTML": "Home.html", "oid": request.user.id,"ooid":log_id})
+def home(request, log_id=''):
+    return render(request, 'welcome.html', {"whichHTML": "Home.html", "oid": request.user.id, "ooid": log_id})
 
 
 def project_list(request):
@@ -64,6 +63,7 @@ def delete_project(request):
     id = request.GET['id']
     DB_project.objects.filter(id=id).delete()
     DB_apis.objects.filter(project_id=id).delete()
+    DB_cases.objects.filter(project_id=id).delete()
     return HttpResponse('')
 
 
@@ -420,5 +420,20 @@ def get_api_log_home(request):
     log_id = request.GET['log_id']
     log = DB_apis_log.objects.filter(id=log_id)
     ret = {"log": list(log.values())[0]}
-    print(ret)
     return HttpResponse(json.dumps(ret), content_type='application/json')
+
+
+def add_case(request, eid):
+    DB_cases.objects.create(project_id=eid, name='')
+    return HttpResponseRedirect('/cases/%s/' % eid)
+
+
+def del_case(request, eid, oid):
+    DB_cases.objects.filter(id=oid).delete()
+    return HttpResponseRedirect('/cases/%s/' % eid)
+
+
+def copy_case(request, eid, oid):
+    old_case = DB_cases.objects.filter(id=oid)[0]
+    DB_cases.objects.create(project_id=old_case.project_id, name=old_case.name+'_副本')
+    return HttpResponseRedirect('/cases/%s/'%eid)

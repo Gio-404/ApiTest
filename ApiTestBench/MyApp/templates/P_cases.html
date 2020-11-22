@@ -36,13 +36,13 @@
             <button onclick="" type="button" class="btn btn-success">运行</button>
             <button onclick="" type="button" class="btn btn-default">设置</button>
             <button onclick="" type="button" class="btn btn-default">查看报告</button>
-            <button onclick="" type="button" class="btn btn-default">复制</button>
-            <button onclick="" type="button" class="btn btn-danger">删除</button>
+            <a href="/copy_case/{{ project.id }}/{{ i.id }}/"><button onclick="" type="button" class="btn btn-default">复制</button></a>
+            <a href="/del_case/{{ project.id }}/{{ i.id }}/"><button onclick="" type="button" class="btn btn-danger">删除</button></a>
         </td>
     </tr>
     {% endfor %}
     </tbody>
 </table>
-<button style="margin-left: 80px;"class="btn btn-primary">新增用例</button>
+<a href="/add_case/{{ project.id }}/"><button style="margin-left: 80px;"class="btn btn-primary">新增用例</button></a>
 </body>
 </html>
