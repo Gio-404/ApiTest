@@ -70,9 +70,29 @@ class DB_apis_log(models.Model):
     def __str__(self):
         return self.api_url
 
+
 class DB_cases(models.Model):
-    project_id = models.CharField(max_length=10,null=True)
+    project_id = models.CharField(max_length=10, null=True)
+    name = models.CharField(max_length=50, null=True)
+
+    def __str__(self):
+        return self.name
+
+class DB_step(models.Model):
+    Case_id  = models.CharField(max_length=10,null=True)
     name = models.CharField(max_length=50,null=True)
+    index = models.IntegerField(null=True)
+    api_method = models.CharField(max_length=10,null=True)
+    api_url = models.CharField(max_length=1000,null=True)
+    api_host = models.CharField(max_length=100,null=True)
+    api_header = models.CharField(max_length=1000,null=True)
+    api_body_method = models.CharField(max_length=10,null=True)
+    api_body = models.CharField(max_length=1000,null=True)
+    get_path = models.CharField(max_length=500,null=True)
+    get_zz = models.CharField(max_length=500,null=True)
+    assert_zz = models.CharField(max_length=500,null=True)
+    assert_qz = models.CharField(max_length=500,null=True)
+    assert_path = models.CharField(max_length=500,null=True)
 
     def __str__(self):
         return self.name
