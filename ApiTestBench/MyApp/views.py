@@ -49,14 +49,16 @@ def child(request, eid, oid, ooid):
     res = child_json(eid, oid, ooid)
     return render(request, eid, res)
 
+def glodict(request):
+    res = {"username":request.user.username}
+    return res
 
 @login_required
 def home(request, log_id=''):
-    return render(request, 'welcome.html', {"whichHTML": "Home.html", "oid": request.user.id, "ooid": log_id})
-
+    return render(request, 'welcome.html', {"whichHTML": "Home.html", "oid": request.user.id, "ooid": log_id,**glodict(request)})
 
 def project_list(request):
-    return render(request, 'welcome.html', {"whichHTML": "project_list.html", "oid": ""})
+    return render(request, 'welcome.html', {"whichHTML": "project_list.html", "oid": "",**glodict(request)})
 
 
 def delete_project(request):
@@ -135,17 +137,17 @@ def api_help(request):
 
 def open_apis(request, id):
     project_id = id
-    return render(request, 'welcome.html', {"whichHTML": "P_apis.html", "oid": project_id})
+    return render(request, 'welcome.html', {"whichHTML": "P_apis.html", "oid": project_id,**glodict(request)})
 
 
 def open_cases(request, id):
     project_id = id
-    return render(request, 'welcome.html', {"whichHTML": "P_cases.html", "oid": project_id})
+    return render(request, 'welcome.html', {"whichHTML": "P_cases.html", "oid": project_id,**glodict(request)})
 
 
 def open_project_set(request, id):
     project_id = id
-    return render(request, 'welcome.html', {"whichHTML": "P_project_set.html", "oid": project_id})
+    return render(request, 'welcome.html', {"whichHTML": "P_project_set.html", "oid": project_id,**glodict(request)})
 
 
 def save_project_set(request, id):

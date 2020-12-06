@@ -12,6 +12,8 @@
 </head>
 <body>
 	<nav id="navbar" class="">
+        <div style="color: white;margin-top: 5px;margin-bottom: 5px;margin-left: 5px">
+            欢迎您：<span>{{ username }}</span>
             <ul>
                 <li>
                     <a href="/project_list/">
@@ -71,7 +73,7 @@
                 var rvnMenu = $("#navbar").rvnm({
 //                    mode: 'mobile',
 //                    responsive: false,
-                    searchable: true,
+                    searchable: false,
                     theme: 'dark-lesb'
                 });
 //                console.log(rvnMenu);
