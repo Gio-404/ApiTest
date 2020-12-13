@@ -54,4 +54,5 @@ urlpatterns = [
     re_path(r'^del_case/(?P<eid>.*)/(?P<oid>.*)/$', del_case),
     re_path(r'^copy_case/(?P<eid>.*)/(?P<oid>.*)/$', copy_case),
     path('get_small/', get_small),
+    path('user_upload/', user_upload),
 ]

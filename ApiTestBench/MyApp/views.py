@@ -50,8 +50,22 @@ def child(request, eid, oid, ooid):
     return render(request, eid, res)
 
 def glodict(request):
-    res = {"username":request.user.username}
+    userimg = str(request.user.id)+'.jpg'
+    res = {"username":request.user.username,"userimg": userimg}
     return res
+
+def user_upload(request):
+    file = request.FILES.get("fileUpload",None)
+    if not file:
+        return HttpResponseRedirect('/home/')
+
+    new_name = str(request.user.id) + '.jpg'
+    print(new_name)
+    destination = open("MyApp/static/user_img/"+new_name, 'wb+')
+    for chunk in file.chunks():
+        destination.write(chunk)
+    destination.close()
+    return HttpResponseRedirect('/home/')
 
 @login_required
 def home(request, log_id=''):
