@@ -80,6 +80,11 @@ def delete_project(request):
     DB_project.objects.filter(id=id).delete()
     DB_apis.objects.filter(project_id=id).delete()
     DB_cases.objects.filter(project_id=id).delete()
+    
+    all_Case = DB_cases.objects.filter(project_id=id)
+    for i in all_Case:
+        DB_step.objects.filter(Case_id=i.id).delete()
+        i.delete()
     return HttpResponse('')
 
 
@@ -446,6 +451,7 @@ def add_case(request, eid):
 
 def del_case(request, eid, oid):
     DB_cases.objects.filter(id=oid).delete()
+    DB_step.objects.filter(Case_id=oid).delete()
     return HttpResponseRedirect('/cases/%s/' % eid)
 
 
@@ -457,5 +463,22 @@ def copy_case(request, eid, oid):
 def get_small(request):
     case_id = request.GET['case_id']
     steps = DB_step.objects.filter(Case_id=case_id).order_by('index')
-    ret = {"all_steps":list(steps.values("id","name"))}
+    ret = {"all_steps":list(steps.values("index","id","name"))}
     return HttpResponse(json.dumps(ret),content_type='application/json')
+
+def add_new_step(request):
+    Case_id = request.GET['Case_id']
+    all_len = len(DB_step.objects.filter(Case_id=Case_id))
+    DB_step.objects.create(Case_id=Case_id,name='我是新步骤',index=all_len+1)
+    return HttpResponse('')
+
+def delete_step(request,eid):
+    step = DB_step.objects.filter(id=eid)[0]
+    index = step.index
+    Case_id = step.Case_id
+    step.delete()
+
+    for i in DB_step.objects.filter(Case_id=Case_id).filter(index__gt=index):
+        i.index -= 1
+        i.save()
+    return HttpResponse('')
