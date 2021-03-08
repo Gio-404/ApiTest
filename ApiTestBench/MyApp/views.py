@@ -49,13 +49,15 @@ def child(request, eid, oid, ooid):
     res = child_json(eid, oid, ooid)
     return render(request, eid, res)
 
+
 def glodict(request):
     userimg = str(request.user.id)+'.jpg'
-    res = {"username":request.user.username,"userimg": userimg}
+    res = {"username": request.user.username, "userimg": userimg}
     return res
 
+
 def user_upload(request):
-    file = request.FILES.get("fileUpload",None)
+    file = request.FILES.get("fileUpload", None)
     if not file:
         return HttpResponseRedirect('/home/')
 
@@ -67,12 +69,14 @@ def user_upload(request):
     destination.close()
     return HttpResponseRedirect('/home/')
 
+
 @login_required
 def home(request, log_id=''):
-    return render(request, 'welcome.html', {"whichHTML": "Home.html", "oid": request.user.id, "ooid": log_id,**glodict(request)})
+    return render(request, 'welcome.html', {"whichHTML": "Home.html", "oid": request.user.id, "ooid": log_id, **glodict(request)})
+
 
 def project_list(request):
-    return render(request, 'welcome.html', {"whichHTML": "project_list.html", "oid": "",**glodict(request)})
+    return render(request, 'welcome.html', {"whichHTML": "project_list.html", "oid": "", **glodict(request)})
 
 
 def delete_project(request):
@@ -80,7 +84,7 @@ def delete_project(request):
     DB_project.objects.filter(id=id).delete()
     DB_apis.objects.filter(project_id=id).delete()
     DB_cases.objects.filter(project_id=id).delete()
-    
+
     all_Case = DB_cases.objects.filter(project_id=id)
     for i in all_Case:
         DB_step.objects.filter(Case_id=i.id).delete()
@@ -156,17 +160,17 @@ def api_help(request):
 
 def open_apis(request, id):
     project_id = id
-    return render(request, 'welcome.html', {"whichHTML": "P_apis.html", "oid": project_id,**glodict(request)})
+    return render(request, 'welcome.html', {"whichHTML": "P_apis.html", "oid": project_id, **glodict(request)})
 
 
 def open_cases(request, id):
     project_id = id
-    return render(request, 'welcome.html', {"whichHTML": "P_cases.html", "oid": project_id,**glodict(request)})
+    return render(request, 'welcome.html', {"whichHTML": "P_cases.html", "oid": project_id, **glodict(request)})
 
 
 def open_project_set(request, id):
     project_id = id
-    return render(request, 'welcome.html', {"whichHTML": "P_project_set.html", "oid": project_id,**glodict(request)})
+    return render(request, 'welcome.html', {"whichHTML": "P_project_set.html", "oid": project_id, **glodict(request)})
 
 
 def save_project_set(request, id):
@@ -457,22 +461,26 @@ def del_case(request, eid, oid):
 
 def copy_case(request, eid, oid):
     old_case = DB_cases.objects.filter(id=oid)[0]
-    DB_cases.objects.create(project_id=old_case.project_id, name=old_case.name+'_副本')
-    return HttpResponseRedirect('/cases/%s/'%eid)
+    DB_cases.objects.create(
+        project_id=old_case.project_id, name=old_case.name+'_副本')
+    return HttpResponseRedirect('/cases/%s/' % eid)
+
 
 def get_small(request):
     case_id = request.GET['case_id']
     steps = DB_step.objects.filter(Case_id=case_id).order_by('index')
-    ret = {"all_steps":list(steps.values("index","id","name"))}
-    return HttpResponse(json.dumps(ret),content_type='application/json')
+    ret = {"all_steps": list(steps.values("index", "id", "name"))}
+    return HttpResponse(json.dumps(ret), content_type='application/json')
+
 
 def add_new_step(request):
     Case_id = request.GET['Case_id']
     all_len = len(DB_step.objects.filter(Case_id=Case_id))
-    DB_step.objects.create(Case_id=Case_id,name='我是新步骤',index=all_len+1)
+    DB_step.objects.create(Case_id=Case_id, name='我是新步骤', index=all_len+1)
     return HttpResponse('')
 
-def delete_step(request,eid):
+
+def delete_step(request, eid):
     step = DB_step.objects.filter(id=eid)[0]
     index = step.index
     Case_id = step.Case_id
