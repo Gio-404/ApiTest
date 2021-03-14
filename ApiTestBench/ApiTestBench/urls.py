@@ -57,4 +57,5 @@ urlpatterns = [
     path('user_upload/', user_upload),
     path('add_new_step/', add_new_step),
     re_path(r'^delete_step/(?P<eid>.*)/$', delete_step),
+    path('get_step/', get_step),
 ]

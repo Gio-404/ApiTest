@@ -489,3 +489,10 @@ def delete_step(request, eid):
         i.index -= 1
         i.save()
     return HttpResponse('')
+
+def get_step(request):
+    step_id = request.GET['step_id']
+    step = DB_step.objects.filter(id=step_id)
+    steplist = list(step.values())[0]
+
+    return HttpResponse(json.dumps(steplist),content_type='application/json')

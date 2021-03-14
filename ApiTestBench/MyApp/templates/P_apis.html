@@ -273,6 +273,7 @@ position: absolute;left: 20%;top: 20%;background-color: #3c4043;box-shadow: 4px 
         $.get('/get_api_data/',{
             'api_id':id,
         },function (ret) {
+            var ret = eval(ret);
             console.log(ret)
             document.getElementById('ts_api_name').value = ret.name;
             document.getElementById('ts_method').value = ret.api_method;

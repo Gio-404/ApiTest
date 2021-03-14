@@ -74,11 +74,12 @@
 </div>
 <ul class="nav navbar-nav" style="margin-top: 5px;margin-left: 5%;width: 90%">
     <li>
-        <select id="step_method" style="height: 35px;" class="form-control">
-            <option value="get"> GET</option>
-            <option value="post"> POST</option>
-            <option value="put"> PUT</option>
-            <option value="delete"> DELETE</option>
+        <select id="step_method" style="height: 35px;width: 103px" class="form-control">
+            <option value="null">请求方式</option>
+            <option value="get">GET</option>
+            <option value="post">POST</option>
+            <option value="put">PUT</option>
+            <option value="delete">DELETE</option>
         </select>
     </li>
     <li style="width: -webkit-calc(100% - 103px)">
@@ -198,7 +199,6 @@
     function refresh_left_div(case_id) {
         var d = document.getElementById('small_list');
         d.innerHTML = '';
-
         $.get('/get_small/',{
             'case_id':case_id
         },function (ret) {
@@ -211,7 +211,7 @@
                 bu.innerText = all_steps[i].index+' - '+all_steps[i].name;
                 bu.id = 'step_btn_'+all_steps[i].id;
                 bu.onclick = function() {
-                    show_step(this.id,this.innerText);
+                    show_step(this.id.split('_')[2],this.innerText);
                 }
                 var del = document.createElement('button');
                 del.className = 'btn btn-default';
@@ -265,6 +265,64 @@
         }
         document.getElementById('step_id').innerText = step_id;
         document.getElementById('step_old_name').innerText = step_name;
+        $.get("/get_step/",{
+            "step_id":step_id
+        },function(ret){
+            var ret = eval(ret);
+            console.log(ret);
+            document.getElementById('step_index').value = ret.index;
+            document.getElementById('step_name').value = ret.name;
+            document.getElementById('step_method').value = ret.api_method;
+            document.getElementById('step_url').value = ret.api_url;
+            document.getElementById('step_host').value = ret.api_host;
+            document.getElementById('step_header').value = ret.api_header;
+            var body_method = '#'+ret.body_method;
+            $("li a[href="+body_method+"]").click();
+            //请求体显示
+            if(ret.body_method == 'Text'){
+                document.getElementById('raw_Text').value = ret.api_body;
+            }
+            if(ret.body_method == 'JavaScript'){
+                document.getElementById('raw_JavaScript').value = ret.api_body;
+            }
+            if(ret.body_method == 'Json'){
+                document.getElementById('raw_Json').value = ret.api_body;
+            }
+            if(ret.body_method == 'Html'){
+                document.getElementById('raw_Html').value = ret.api_body;
+            }
+            if(ret.body_method == 'Xml'){
+                document.getElementById('raw_Xml').value = ret.api_body;
+            }
+            if(ret.body_method == 'form-data'){
+                var tbody = document.getElementById('mytbody');
+                body = eval(ret.api_body);
+                for(var i=0;i<body.length;i++){
+                    key = body[i][0];
+                    value = body[i][1];
+                    var childs_tr = tbody.children;
+                    childs_tr[i].children[0].innerText = key;
+                    childs_tr[i].children[1].innerText = value;
+                    if(i<body.length-1){
+                        document.getElementById('add').click()
+                    }
+                }
+            }
+            if(ret.body_method == 'x-www-form-urlencoded'){
+                var tbody = document.getElementById('mytbody2');
+                body = eval(ret.api_body);
+                for(var i=0;i<body.length;i++){
+                    key = body[i][0];
+                    value = body[i][1];
+                    var childs_tr = tbody.children;
+                    childs_tr[i].children[0].innerText = key;
+                    childs_tr[i].children[1].innerText = value;
+                    if(i<body.length-1){
+                        document.getElementById('add2').click()
+                    }
+                }
+            }
+        })
     }
     function close_right_div(which) {
         if(which == "save"){
